@@ -1,0 +1,9 @@
+Comment évaluer une situation dans une situation donnée ?
+
+Calcul du nombre de points de l'agent 1:
+- P1 : Somme des points alignés qui peuvent finir en win de l'agent 1 (ie : pas bloqué par les bords ou par l'adversaire)
+- P2 : Somme des points alignés qui peuvent finir en win de l'agent 2 (ie : pas bloqué par les bords ou par l'adversaire)
+Reward = P1 - P2
+
+Si agent perd : -100
+Si agent gagne : + 100
