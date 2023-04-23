@@ -44,6 +44,7 @@ class EnvAgainstHuman(EnvAgainstPolicy):
     def __init__(self, env, policy=None, first_player=True, board=None):
         self.board = board
         self.policy = HumanPlayer(name="faufau", board=board)
+        self.first_player = first_player
         super().__init__(env, policy, first_player)
 
     def step(self, action):
@@ -65,3 +66,34 @@ class EnvAgainstHuman(EnvAgainstPolicy):
             obs, reward, terminated, _, _ = self.env.last()
             self.last_step = obs, -reward, terminated, False, {}
         return self.last_step
+    
+class EnvAgainstChat(EnvAgainstPolicy):
+    def __init__(self, env, policy=None, first_player=True, board=None):
+        self.board = board
+        self.policy = HumanPlayer(name="faufau", board=board)
+        self.first_player = first_player
+        super().__init__(env, policy, first_player)
+
+    def step(self, action):
+        if self.first_player:
+            # Q-learner plays
+            print("action : ",action)
+            print("board : ",self.board)
+            print("env : ",self.env.step(action))
+            self.env.step(action)
+            obs, reward, terminated, _, _ = self.env.step(action)
+            self.board.drop_piece(self.board.board, self.board.get_next_row(self.board.board, action), action, 1)
+            self.board.draw_board()
+        else:
+            # Human plays
+            obs = self.env.last()[0]
+            action = self.policy.get_action(obs)
+            if action is None:
+                return obs, 0, True, False, {}
+            obs, reward, terminated, _, _ = self.env.step(action)
+            self.board.drop_piece(self.board.board, self.board.get_next_row(self.board.board, action), action, 2)
+            self.board.draw_board()
+
+        self.first_player = not self.first_player
+        return obs, -reward, terminated, False, {}
+
