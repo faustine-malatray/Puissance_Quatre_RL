@@ -38,20 +38,26 @@ class EnvAgainstPolicy:
 
 
 class EnvAgainstHuman(EnvAgainstPolicy):
-    def __init__(self, env, policy=None, first_player=True):
+    def __init__(self, env, policy=None, first_player=True, board=None):
+        self.board = board
+        self.policy = HumanPlayer(name="faufau", board=board)
         super().__init__(env, policy, first_player)
-        self.board = Board()
-        self.policy = HumanPlayer(name="faufau", board=self.board)
 
     def step(self, action):
+        # q-learner plays
         self.env.step(action)
+        self.board.drop_piece(self.board.board, self.board.get_next_row(
+            self.board.board, action), action, 1)
         self.board.draw_board()
         obs, reward, terminated, _, _ = self.env.last()
         if terminated:
             self.last_step = obs, reward, True, False, {}
         else:
+            # human plays
             action = self.policy.get_action(obs)
             self.env.step(action)
+            self.board.drop_piece(self.board.board, self.board.get_next_row(
+                self.board.board, action), action, 2)
             self.board.draw_board()
             obs, reward, terminated, _, _ = self.env.last()
             self.last_step = obs, -reward, terminated, False, {}
