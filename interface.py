@@ -13,39 +13,35 @@ env.reset()
 
 def game_user_player(env, agent):
     board = Board()
-    board.draw_board()
 
+    # Game loop
     # also creates the human object
-    # if true, you play yellow
-    eval_env = EnvAgainstHuman(env, first_player=False, board=board)
+    # if first_player: le q-player commence
+    # sinon: l'humain commence
+    eval_env = EnvAgainstHuman(env, first_player=True, board=board)
     done = False
     eval_env.reset()
     obs, _, _, _, _ = eval_env.last()
-
-    # Game loop
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                # Our q-learner agent plays
-                action = agent.get_action(obs, epsilon=0)
-                if action is None:
-                    # The agent cannot play: draw?
-                    return 0
-                eval_env.step(action)
-                next_obs, reward, done, _, _ = eval_env.last()
-                # We update the agent's Q-table
-                agent.update(obs, action, reward, done, next_obs)
-
-                if done and reward == 1:
-                    # The agent won
-                    return 1
-                elif done and reward == -1:
-                    # The agent lost
-                    return -1
-
-                obs = next_obs
+            # Our q-learner agent plays
+            action = agent.get_action(obs, epsilon=0)
+            if action is None:
+                # The agent cannot play: draw?
+                return 0
+            eval_env.step(action)
+            next_obs, reward, done, _, _ = eval_env.last()
+            # We update the agent's Q-table
+            agent.update(obs, action, reward, done, next_obs)
+            if done and reward == 1:
+                # The agent won
+                return 1
+            elif done and reward == -1:
+                # The agent lost
+                return -1
+            obs = next_obs
 
     # Quit Pygame
     pygame.quit()

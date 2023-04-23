@@ -25,9 +25,12 @@ class EnvAgainstPolicy:
     def reset(self):
         self.env.reset()
         if not(self.first_player):
-            # CAD 1rst player is q-learner
+            # CAD 1rst player is human opponent
             obs, _, _, _, _ = self.env.last()
             action = self.policy.get_action(obs)
+            self.board.drop_piece(self.board.board, self.board.get_next_row(
+                self.board.board, action), action, 2)
+            self.board.draw_board()
             self.env.step(action)
 
         self.last_step = self.env.last()
