@@ -25,6 +25,12 @@ class MalynxDeep:
     def get_action(self, obs_mask, epsilon=None):
         if np.sum(obs_mask['observation']) == 0:
             return 3
+        if np.sum(obs_mask['observation']) == 3:
+            for i in range(7):
+                if np.sum(obs_mask['observation'][:i]) == 2:
+                    if i < 4:
+                        return i + 1
+                    return i-1
         board = obs_mask['observation'][:, :, 0]- obs_mask['observation'][:, :, 1]
         best_move_score = -10000
         best_move = []
