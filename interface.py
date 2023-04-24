@@ -100,9 +100,13 @@ def game_user_player(env, agent):
             agent.update(obs, action, reward, done, next_obs)
             if done and reward == 1:
                 # The agent won
+                # Quit Pygame
+                pygame.quit()
                 return 1
             elif done and reward == -1:
                 # The agent lost
+                # Quit Pygame
+                pygame.quit()
                 return -1
             obs = next_obs
 
@@ -112,10 +116,48 @@ def game_user_player(env, agent):
     # The game ended in a draw
     return 0
 
+import matplotlib.pyplot as plt
+
+def train_from_human(env, agent, N_episodes=20, N_games=20):
+    # 
+    # We print the evolution of the agent's statistics, and at the end we plot the evolution of the win rate
+    print(f"{'Episode':<10} {'Win':<10} {'Loss':<10} {'Draw':<10}")
+    win_rate = []
+    for i in range(N_episodes):
+        win = 0
+        loss = 0
+        draw = 0
+        for _ in range(N_games):
+            result = game_user_player(env, agent)
+            if result == 1:
+                win += 1
+            elif result == -1:
+                loss += 1
+            else:
+                draw += 1
+        print(f"{i:<10} {win:<10} {loss:<10} {draw:<10}")
+        win_rate.append(win / N_games)
+
+    plt.plot(win_rate)
+    #calculate equation for trendline
+    x = np.linspace(0, N_episodes-1, N_episodes)
+    z = np.polyfit(x, win_rate, 1)
+    p = np.poly1d(z)
+    #add trendline to plot
+    plt.plot(x, p(x))
+    #legends
+    plt.xlabel("Episode")
+    plt.ylabel("Win rate")
+    plt.title("Evolution of the win rate for {} against human player".format(agent.name))
+    plt.show()
 
 
 q_learning_agent = QLearningAgent()
 with open("training/agent_q_learner.pkl", 'rb') as f:
     q_learning_agent.q_table = pickle.load(f)
 
-game_user_player(env, q_learning_agent)
+
+
+train_from_human(env, q_learning_agent)
+
+# game_user_player_come(env, q_learning_agent)

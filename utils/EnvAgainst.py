@@ -12,12 +12,14 @@ class EnvAgainstPolicy:
 
     def step(self, action):
         self.env.step(action)
+        print("2")
         obs, reward, terminated, _, _ = self.env.last()
         if terminated:
             self.last_step = obs, reward, True, False, {}
         else:
             action = self.policy.get_action(obs)
             self.env.step(action)
+            print("3")
             obs, reward, terminated, _, _ = self.env.last()
             self.last_step = obs, -reward, terminated, False, {}
         return self.last_step
@@ -31,8 +33,8 @@ class EnvAgainstPolicy:
             self.board.drop_piece(self.board.board, self.board.get_next_row(
                 self.board.board, action), action, 2)
             self.board.draw_board()
-            self.env.step(action)
-
+            print("1")
+            self.step(action)
         self.last_step = self.env.last()
         return self.last_step
 
