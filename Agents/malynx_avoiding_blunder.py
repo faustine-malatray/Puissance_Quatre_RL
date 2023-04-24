@@ -35,13 +35,13 @@ class MalynxAvoidingBlunder:
                     return i-1
         board = obs_mask['observation'][:, :, 0]- obs_mask['observation'][:, :, 1]
         best_move_score = - 10000
-        best_move = 10
+        best_move = []
         for i, legal in enumerate(obs_mask["action_mask"]):
             if legal:
                 move_score = get_move_score_with_blunder(board, i, self.random_percentage)
-                if move_score == best_move_score and rd.random() < 0.5:
-                    best_move = i
+                if move_score == best_move_score:
+                    best_move.append(i)
                 if move_score > best_move_score:
                     best_move_score = move_score
-                    best_move = i
-        return best_move
+                    best_move = [i]
+        return rd.choice(best_move)
